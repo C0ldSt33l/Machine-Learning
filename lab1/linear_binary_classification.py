@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animator
 
-from read_csv import get_data_from_csv
-from point import *
+from helpers.read_csv import get_data_from_csv
+from helpers.point import *
 from neuron import ClassificationNeuron
-from line import Line, get_seperate_line
+from helpers.line import Line, get_line
 
 def split_points(points: PointList) -> tuple[PointList, PointList]:
     first = list(filter(lambda el: el.mark == -1, points))
@@ -23,8 +23,8 @@ def setup_plot(ax, red_points: PointList, blue_points: PointList, x_lims: list[f
     ax.scatter([p.x for p in blue_points], [p.y for p in blue_points], color='blue')
 
 def linear_binary_classification_test():
-    data = get_data_from_csv(r'data/classifaction/learn sample.csv', MarkedPoint)
-    neuron = ClassificationNeuron()
+    data = get_data_from_csv(r'data/classification/line with angle.csv', MarkedPoint)
+    neuron = ClassificationNeuron(learnin_speed=0.1)
 
     xs = [p.x for p in data]
     ys = [p.y for p in data]
@@ -45,7 +45,7 @@ def linear_binary_classification_test():
         is_learned = neuron.process_learn(data)
 
         a, b = neuron.get_a_and_b()
-        sep_lines.append(get_seperate_line(xs, a, b))
+        sep_lines.append(get_line(xs, a, b))
         if is_learned:
             print(f'ALL POINTS ARE GUESSED CORRECTLLY AT {iter}TH ATTEMPT')
             break

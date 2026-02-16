@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from point import *
-from line import calc_y, get_seperate_line
+from helpers.point import *
+from helpers.line import calc_y, get_line
 
 class ClassificationNeuron:
     weights: tuple[float, float]
@@ -78,23 +78,14 @@ class RegressionNeuron:
         self.weight = self._modify_weight(self.weight, delta, input)
         self.bias = self._modify_weight(self.bias, delta, 1)
 
-    def process_learn(self, points: list[Point], last_offset: float, xs) -> bool:
-
-        _xs = [p.x for p in points]
-        ys = [p.y for p in points]
+    def process_learn(self, points: list[Point], last_offset: float, precision: float = 0.01) -> bool:
         for p in points:
             guess = self.guess(p.x)
             if guess != p.y:
                 self.learn(p.y, guess, p.x)
-            a, b = self.get_a_and_b()
-            line = get_seperate_line(xs, a, b)
 
-            # plt.scatter(_xs, ys, color='red')
-            # plt.plot(line.xs, line.ys, color='green')
-            # plt.show()
         cur_offset = self.get_avg_offset(points)
-        print('offset delta:', abs(last_offset - cur_offset))
-        return abs(last_offset - cur_offset) < 0.001
+        return abs(last_offset - cur_offset) < precision
 
     def get_avg_offset(self, points: list[Point]) -> float:
         s = 0

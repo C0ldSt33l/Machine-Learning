@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animator
 
-from read_csv import get_data_from_csv
-from point import Point
+from helpers.read_csv import get_data_from_csv
+from helpers.point import Point
 from neuron import RegressionNeuron 
-from line import Line, get_seperate_line
+from helpers.line import Line, get_line
 
 def regression_test():
-    data = get_data_from_csv(r'data/regression/learn sample (big).csv', Point)
-    neuron = RegressionNeuron(learnin_speed=0.001)
+    data = get_data_from_csv(r'data/regression/learn sample.csv', Point)
+    neuron = RegressionNeuron(learnin_speed=0.0001)
 
     xs = [p.x for p in data]
     ys = [p.y for p in data]
@@ -23,32 +23,23 @@ def regression_test():
     iter = 0
     last_offset = 100
     while iter := iter + 1:
-        is_learned = neuron.process_learn(data, last_offset, [x_min, x_max])
+        is_learned = neuron.process_learn(data, last_offset, 0.001)
         last_offset = neuron.get_avg_offset(data)
 
         a, b = neuron.get_a_and_b()
-        reg_lines.append(get_seperate_line(xs, a, b))
+        reg_lines.append(get_line(xs, a, b))
         if is_learned:
             print(f'ALL POINTS ARE GUESSED CORRECTLLY AT {iter}TH ATTEMPT')
-            break
-
-        if iter == 100:
             break
     
     def animate(i):
         sep_line = reg_lines[i]
         line.set_data(sep_line.xs, sep_line.ys)
         if i == len(reg_lines)-1:
-            line.set_color('grey')
+            line.set_color('black')
         return line,
 
     frames = len(reg_lines)
-    if iter > 10:
-        frames = 1
-        last_line = reg_lines[-1]
-        reg_lines.clear()
-        reg_lines.append(last_line)
-
     ani = animator.FuncAnimation(fig, animate, frames=frames, interval=50, blit=True, repeat=False)
     plt.show()
 

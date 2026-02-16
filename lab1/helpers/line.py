@@ -9,6 +9,6 @@ class Line:
 def calc_y(x: float, a: float, b: float):
     return a * x + b
 
-def get_seperate_line(xs: list[float], a: float, b: float) -> Line:
+def get_line(xs: list[float], a: float, b: float) -> Line:
     ys = [calc_y(x, a, b) for x in xs]
     return Line(xs, ys)
