@@ -1,16 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animator
+
 from read_csv import get_data_from_csv
 from point import *
-from neuron import *
-
-class Line:
-    xs: list[float]
-    ys: list[float]
-
-    def __init__(self, xs: list[float], ys: list[float]):
-        self.xs = xs
-        self.ys = ys
+from neuron import ClassificationNeuron
+from line import Line, get_seperate_line
 
 def split_points(points: PointList) -> tuple[PointList, PointList]:
     first = list(filter(lambda el: el.mark == -1, points))
@@ -28,15 +22,9 @@ def setup_plot(ax, red_points: PointList, blue_points: PointList, x_lims: list[f
     ax.scatter([p.x for p in red_points], [p.y for p in red_points], color='red')
     ax.scatter([p.x for p in blue_points], [p.y for p in blue_points], color='blue')
 
-def get_seperate_line(xs: list[float], a: float, b: float) -> Line:
-    def calc_y(x: float):
-        return a * x + b
-    ys = [calc_y(x) for x in xs]
-    return Line(xs, ys)
-
-def process():
-    data = get_data_from_csv(r'ai/line with angle.csv', MarkedPoint)
-    neuron = Neuron()
+def linear_binary_classification_test():
+    data = get_data_from_csv(r'data/classifaction/learn sample.csv', MarkedPoint)
+    neuron = ClassificationNeuron()
 
     xs = [p.x for p in data]
     ys = [p.y for p in data]
@@ -74,4 +62,4 @@ def process():
 
 
 if __name__ == '__main__':
-    process()
+    linear_binary_classification_test()
