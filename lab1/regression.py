@@ -2,13 +2,47 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animator
 
 from helpers.read_csv import get_data_from_csv
-from helpers.point import Point
-from neuron import RegressionNeuron 
-from helpers.line import Line, get_line
+from helpers.point import *
+from neuron import Neuron
+from helpers.line import Line, get_line, calc_y
+
+def guess(input: float) -> float:
+    return input
+
+def process_learn(neuron: Neuron, points: list[MarkedPoint]) -> bool:
+    def get_avg_offset(points: list[Point], a: float, b: float) -> float:
+        s = 0
+        for p in points:
+            y = calc_y(p.x, a, b)
+            s += (y - p.y) ** 2
+        return  s / len(points)
+
+    for p in points:
+        guess = neuron.guess([p.x])
+        if guess != p.y:
+            neuron.learn(p.y, guess, [p.x])
+
+    cur_offset = get_avg_offset(points, *neuron.get_a_and_b())
+    is_learned = abs(neuron.last_offset - cur_offset) < neuron.precision
+    neuron.last_offset = cur_offset
+    return is_learned
+
+def get_a_and_b(neuron: Neuron) -> tuple[float, float]:
+    return (neuron.weights[0], neuron.bias)
+
+
 
 def regression_test():
     data = get_data_from_csv(r'data/regression/learn sample.csv', Point)
-    neuron = RegressionNeuron(learnin_speed=0.0001)
+    neuron = Neuron(
+        weights=[0],
+        learnin_speed=0.001,
+        guess_func=guess,
+        learn_func=process_learn,
+        get_a_and_b_func=get_a_and_b,
+        last_offset=100,
+        precision=0.001
+    )
 
     xs = [p.x for p in data]
     ys = [p.y for p in data]
@@ -21,10 +55,10 @@ def regression_test():
     lim_range = 2
     setup_plot(ax, data, [x_min, x_max + lim_range], [y_min - lim_range, y_max + lim_range])
     iter = 0
-    last_offset = 100
+    # last_offset = 100
     while iter := iter + 1:
-        is_learned = neuron.process_learn(data, last_offset, 0.001)
-        last_offset = neuron.get_avg_offset(data)
+        is_learned = neuron.process_learn(data)
+        # last_offset = neuron.get_avg_offset(data)
 
         a, b = neuron.get_a_and_b()
         reg_lines.append(get_line(xs, a, b))

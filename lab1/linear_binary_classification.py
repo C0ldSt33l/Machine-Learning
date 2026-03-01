@@ -3,9 +3,10 @@ import matplotlib.animation as animator
 
 from helpers.read_csv import get_data_from_csv
 from helpers.point import *
-from neuron import ClassificationNeuron
+from neuron import Neuron
 from helpers.line import Line, get_line
 
+# Chart help funcs
 def split_points(points: PointList) -> tuple[PointList, PointList]:
     first = list(filter(lambda el: el.mark == -1, points))
     second = list(filter(lambda el: el.mark == 1, points))
@@ -22,9 +23,37 @@ def setup_plot(ax, red_points: PointList, blue_points: PointList, x_lims: list[f
     ax.scatter([p.x for p in red_points], [p.y for p in red_points], color='red')
     ax.scatter([p.x for p in blue_points], [p.y for p in blue_points], color='blue')
 
+# Neuron funcs
+def guess(input: float) -> float:
+    return 1 if input > 0 else -1
+
+def process_learn(neuron: Neuron, points: list[MarkedPoint]) -> bool:
+    is_learned = True
+    for p in points:
+        coords = p.get_coords()
+        guess = neuron.guess(coords)
+        if guess != p.mark:
+            is_learned = False
+            neuron.learn(p.mark, guess, coords)
+    return is_learned
+
+def get_a_and_b(neuron: Neuron) -> tuple[float, float]:
+    x, y, offset = neuron.weights[0], neuron.weights[1], neuron.bias
+    return (
+        -x / y,
+        -offset / y
+    )
+
+
 def linear_binary_classification_test():
     data = get_data_from_csv(r'data/classification/line with angle.csv', MarkedPoint)
-    neuron = ClassificationNeuron(learnin_speed=0.1)
+    neuron = Neuron(
+        weights=[0, 0],
+        learnin_speed=0.1,
+        guess_func=guess,
+        learn_func=process_learn,
+        get_a_and_b_func=get_a_and_b
+    )
 
     xs = [p.x for p in data]
     ys = [p.y for p in data]

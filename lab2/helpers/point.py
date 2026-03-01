@@ -14,11 +14,8 @@ class Point:
     def get_coords(self) -> tuple[float, float]:
         return (self.x, self.y)
 
-    def to_marked_point(self, mark: float) -> 'MarkedPoint':
-        return MarkedPoint(self.x, self.y, mark)
-
 class MarkedPoint(Point):
-    mark: float
+    mark: int
 
     def __init__(self, x, y, mark):
         super().__init__(x, y)
