@@ -3,8 +3,8 @@ import matplotlib.animation as animator
 
 from helpers.read_csv import get_data_from_csv
 from helpers.point import *
-from neuron import Neuron
 from helpers.line import Line, get_line
+from neuron import Neuron
 
 def split_points(points: PointList) -> tuple[PointList, PointList]:
     first = list(filter(lambda el: el.mark == -1, points))
