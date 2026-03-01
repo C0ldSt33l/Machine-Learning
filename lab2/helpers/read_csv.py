@@ -16,7 +16,7 @@ def get_data_from_csv(file: str, type: Type[T]) -> list[T]:
         l = l.strip()
         p = _create_point(
             type,
-            list(map(lambda s: float(s), l.split(',')))[:arg_count]
+            list(map(lambda s: round(float(s), 3), l.split(',')))[:arg_count]
         )
         points.append(p)
 
