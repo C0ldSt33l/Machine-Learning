@@ -1,29 +1,40 @@
-import matplotlib.pyplot as plt
 import matplotlib.animation as animator
+import matplotlib.pyplot as plt
 
-from helpers.read_csv import get_data_from_csv
-from helpers.point import *
 from helpers.line import Line, get_line
+from helpers.point import *
+from helpers.read_csv import get_data_from_csv
 from neuron import Neuron
 
-def split_points(points: PointList) -> tuple[PointList, PointList]:
+
+def split_points(
+    points: list[MarkedPoint],
+) -> tuple[list[MarkedPoint], list[MarkedPoint]]:
     first = list(filter(lambda el: el.mark == -1, points))
     second = list(filter(lambda el: el.mark == 1, points))
     return (first, second)
 
-def setup_plot(ax, red_points: PointList, blue_points: PointList, x_lims: list[float], y_lims: list[float]):
-    ax.set_title('Non-linear Binary Classification')
 
-    ax.set_xlabel('X')
+def setup_plot(
+    ax,
+    red_points: PointList,
+    blue_points: PointList,
+    x_lims: list[float],
+    y_lims: list[float],
+):
+    ax.set_title("Non-linear Binary Classification")
+
+    ax.set_xlabel("X")
     ax.set_xlim(*x_lims)
-    ax.set_ylabel('Y')
+    ax.set_ylabel("Y")
     ax.set_ylim(*y_lims)
 
-    ax.scatter([p.x for p in red_points], [p.y for p in red_points], color='red')
-    ax.scatter([p.x for p in blue_points], [p.y for p in blue_points], color='blue')
+    ax.scatter([p.x for p in red_points], [p.y for p in red_points], color="red")
+    ax.scatter([p.x for p in blue_points], [p.y for p in blue_points], color="blue")
+
 
 def nonlinear_classification_test():
-    data = get_data_from_csv(r'data/straight_xor.csv', MarkedPoint)
+    data = get_data_from_csv(r"data/straight_xor.csv", MarkedPoint)
     # neuron = Neuron(
     #     weights=[0, 0],
     #     learnin_speed=0.1,
@@ -31,6 +42,8 @@ def nonlinear_classification_test():
     #     learn_func=process_learn,
     #     get_a_and_b_func=get_a_and_b
     # )
+    n = Neuron(10)
+    print(n.weights)
 
     xs = [p.x for p in data]
     ys = [p.y for p in data]
@@ -39,12 +52,13 @@ def nonlinear_classification_test():
 
     sep_lines: list[Line] = []
     fig, ax = plt.subplots()
-    line, = ax.plot([], [], color='green')
+    (line,) = ax.plot([], [], color="green")
     lim_range = 0.5
     setup_plot(
-        ax, *split_points(data),
+        ax,
+        *split_points(data),
         [x_min - lim_range, x_max + lim_range],
-        [y_min - lim_range, y_max + lim_range]
+        [y_min - lim_range, y_max + lim_range],
     )
     iter = 0
     # while iter := iter + 1:
@@ -55,7 +69,7 @@ def nonlinear_classification_test():
     #     if is_learned:
     #         print(f'ALL POINTS ARE GUESSED CORRECTLLY AT {iter}TH ATTEMPT')
     #         break
-    
+
     # def animate(i):
     #     sep_line = sep_lines[i]
     #     line.set_data(sep_line.xs, sep_line.ys)
@@ -67,5 +81,5 @@ def nonlinear_classification_test():
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     nonlinear_classification_test()
