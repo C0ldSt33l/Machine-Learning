@@ -11,3 +11,6 @@ hidden = Layer(
 output = Layer(1, 2, af.logistic, af.logistic_derivate)
 
 nn = NeuronNet([hidden, output])
+nn.print_weights()
+
+print(nn.guess([0, 1]))

@@ -1,3 +1,5 @@
+from matplotlib.pyplot import xscale
+
 from neuron import Neuron
 
 
@@ -8,6 +10,9 @@ class Line:
     def __init__(self, xs: list[float], ys: list[float]):
         self.xs = xs
         self.ys = ys
+
+    def __str__(self) -> str:
+        return f"L:({self.xs}) ({self.ys})"
 
 
 def calc_y(x: float, a: float, b: float):

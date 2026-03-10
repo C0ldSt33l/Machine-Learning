@@ -28,13 +28,13 @@ class Neuron:
         self,
         weight_count: int,
         bias: float | None = None,
-        learnin_speed: float = 0.01,
+        learnin_speed: float = 0.1,
         activation: Callable | None = None,
         activation_derivate: Callable | None = None,
         prev_layer: Layer | None = None,
     ):
-        self.weights = [uniform(0.0, 100.0) for _ in range(weight_count)]
-        self.bias = bias if bias is not None else uniform(0.0, 100.0)
+        self.weights = [uniform(-100.0, 100.0) for _ in range(weight_count)]
+        self.bias = bias if bias is not None else uniform(-100.0, 100.0)
         self.learning_speed = learnin_speed
         self.activation = activation
         self.activation_derivate = activation_derivate
@@ -47,44 +47,37 @@ class Neuron:
             raise Exception("Activation func is not set")
 
         self.input = input
-        net = self._net(input)
-        return self.activation(net)
+        self.net = self._net(input)
+        self.output = self.activation(self.net)
+        return self.output
 
     def _net(self, input: list[float]) -> float:
         def get_prod(enum) -> float:
             return enum[0] * enum[1]
 
         sumprod = sum(map(get_prod, zip(self.weights, input)))
-
         return sumprod + self.bias
 
-    def learn(self, input: list[float]):
+    def learn(self):
         for i in range(len(self.weights)):
-            self.weights[i] = self._modify_weight(self.weights[i], input[i])
+            self.weights[i] = self._modify_weight(self.weights[i], self.input[i])
         self.bias = self._modify_weight(self.bias, 1)
 
     def _modify_weight(self, weight: float, input: float) -> float:
         return weight - self.learning_speed * self.local_gradient * input
 
-    def get_local_gradient_output(
-        self, answer: float, guess: float, net: float
-    ) -> float:
+    def calc_local_gradient_output(self, answer: float):
         if self.activation_derivate is None:
             raise Exception("Activation derivate is not set")
 
-        delta = answer - guess
-        self.local_gradient = delta * self.activation_derivate(net)
-        return self.local_gradient
+        delta = answer - self.output
+        self.local_gradient = delta * self.activation_derivate(self.net)
 
-    def get_local_gradient_hidden(self, net: float, weight_idx: int) -> float:
+    def calc_local_gradient_hidden(self, weight_idx: int):
         if self.activation_derivate is None:
             raise Exception("Activation derivate is not set")
+        if self.prev_layer is None:
+            raise Exception("Prev layer is not set")
 
-        sumprod_gradients = sum(
-            map(
-                lambda n: n.local_gradient * n.weights[weight_idx],
-                cast(Layer, self.prev_layer).neurons,
-            )
-        )
-        self.local_gradient = self.activation_derivate(net) * sumprod_gradients
-        return self.local_gradient
+        sumprod_gradients = self.prev_layer.get_local_gradient_sum(weight_idx)
+        self.local_gradient = self.activation_derivate(self.net) * sumprod_gradients
