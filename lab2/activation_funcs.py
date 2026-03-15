@@ -5,6 +5,7 @@ type ActivationFunc = Callable[[float], float]
 
 
 def logistic(x: float) -> float:
+    # print("X: ", x)
     return 1 / (1 + exp(-x))
 
 
@@ -23,7 +24,7 @@ def hyperbolic_tangent_derivate(x: float) -> float:
     return 1 - hyperbolic_tangent(x)
 
 
-# TODO: search about rational sigmioda & its derivate
+# TODO: search about rational sigmoida & its derivate
 def soft_sign(x: float) -> float:
     return 1 / (1 + abs(x))
 

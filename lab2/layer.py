@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from activation_funcs import ActivationFunc
+from helpers.log import append_tab_to_multilines
 from neuron import Neuron
 
 if TYPE_CHECKING:
@@ -76,3 +77,9 @@ class Layer:
         else:
             for n in self.neurons:
                 n.calc_local_gradient_output(answer)
+
+    def get_data_str(self, idx: int) -> str:
+        data = f"Layer#{idx}\n"
+        for i, n in enumerate(self.neurons):
+            data += n.get_data_str(i)
+        return data

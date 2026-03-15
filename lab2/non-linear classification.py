@@ -1,8 +1,11 @@
+from datetime import datetime
+
 import matplotlib.animation as animator
 import matplotlib.pyplot as plt
 
 import activation_funcs as af
 from helpers.line import *
+from helpers.log import write_log
 from helpers.point import *
 from helpers.read_csv import get_data_from_csv
 from layer import Layer
@@ -52,7 +55,7 @@ def nonlinear_classification_test():
     hidden = Layer(2, 2, af.relu, af.relu_derivate)
     output = Layer(1, 2, af.logistic, af.logistic_derivate)
 
-    nn = NeuronNet([hidden, output], max_iter=1000)
+    nn = NeuronNet([hidden, output], max_iter=10)
     nn.set_learn_func(learn_func)
 
     xs = [p.x for p in data]
@@ -72,8 +75,12 @@ def nonlinear_classification_test():
         [x_min - lim_range, x_max + lim_range],
         [y_min - lim_range, y_max + lim_range],
     )
+
+    logname = datetime.now().strftime("%Y-%m-%d %H_%M_%S")
+
     iter = 0
     while (iter := iter + 1) <= nn.max_iter:
+        print("Iter: ", iter)
         is_learned = nn.process_learn(data)
 
         last_layer = nn.layers[-1]
@@ -81,8 +88,7 @@ def nonlinear_classification_test():
         a2, b2 = get_a_and_b_classification(last_layer.neurons[1])
         sep_lines.append((get_line(min_max_xs, a1, b1), get_line(min_max_xs, a2, b2)))
 
-        nn.print_weights()
-        nn.print_gradients()
+        write_log(nn.get_data_str(iter), filename=logname)
 
         if is_learned:
             print(f"ALL POINTS ARE GUESSED CORRECTLLY AT {iter}TH ATTEMPT")

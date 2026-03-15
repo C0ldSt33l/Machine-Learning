@@ -33,8 +33,8 @@ class Neuron:
         activation_derivate: Callable | None = None,
         prev_layer: Layer | None = None,
     ):
-        self.weights = [uniform(-100.0, 100.0) for _ in range(weight_count)]
-        self.bias = bias if bias is not None else uniform(-100.0, 100.0)
+        self.weights = [uniform(-10.0, 10.0) for _ in range(weight_count)]
+        self.bias = bias if bias is not None else uniform(-10.0, 10.0)
         self.learning_speed = learnin_speed
         self.activation = activation
         self.activation_derivate = activation_derivate
@@ -81,3 +81,15 @@ class Neuron:
 
         sumprod_gradients = self.prev_layer.get_local_gradient_sum(weight_idx)
         self.local_gradient = self.activation_derivate(self.net) * sumprod_gradients
+
+    def get_data_str(self, id: int) -> str:
+        return f"""
+        Neuron#{id}
+        weights: {self.weights}
+        bias: {self.bias}
+        net: {self.net}
+        local gradient: {self.local_gradient}
+
+        input: {self.input}
+        output: {self.output}
+        """

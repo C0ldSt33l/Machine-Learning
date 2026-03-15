@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Callable
 
+from helpers.log import append_tab_to_multilines
 from helpers.point import MarkedPoint
 from layer import Layer
 
@@ -54,3 +55,10 @@ class NeuronNet:
             print(f"Layer#{i}")
             for j, n in enumerate(l.neurons):
                 print(f"Nueron#{j} gradient: {n.local_gradient}")
+
+    def get_data_str(self, iter: int) -> str:
+        data = f"Iter#{iter}\n"
+        for i, l in enumerate(reversed(self.layers)):
+            data += l.get_data_str(i)
+        data += "//////////////////////////////\n"
+        return data
