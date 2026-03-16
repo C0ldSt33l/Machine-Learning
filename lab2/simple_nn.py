@@ -1,11 +1,7 @@
-import activation_funcs as af
-from layer import Layer
-from neuron_net import NeuronNet
+from activation import LogisticActivation, ReluActivation
 
-hidden = Layer(2, 2, af.relu, af.relu_derivate)
-output = Layer(1, 2, af.logistic, af.logistic_derivate)
+act = LogisticActivation()
+print(act.activate(5))
 
-nn = NeuronNet([hidden, output])
-nn.print_weights()
-
-print(nn.guess([0, 1]))
+act = ReluActivation()
+print(act.activate(5))

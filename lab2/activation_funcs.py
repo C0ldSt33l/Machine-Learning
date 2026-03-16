@@ -1,7 +1,8 @@
 from math import exp
 from typing import Callable
 
-type ActivationFunc = Callable[[float], float]
+type ActivationFunc = Callable[..., float]
+type DerivateFunc = Callable[..., float]
 
 
 def logistic(x: float) -> float:
@@ -41,12 +42,9 @@ def relu_derivate(x: float) -> float:
     return 0 if x < 0 else 1
 
 
-leaky_relu_mult: float = 0.1
+def leaky_relu(x: float, mult: float) -> float:
+    return mult * x if x < 0 else x
 
 
-def leaky_relu(x: float) -> float:
-    return leaky_relu_mult * x if x < 0 else x
-
-
-def leaky_relu_derivate(x: float) -> float:
-    return leaky_relu_mult if x < 0 else x
+def leaky_relu_derivate(x: float, mult: float) -> float:
+    return mult if x < 0 else x

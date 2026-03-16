@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from activation import BaseActivation
 from activation_funcs import ActivationFunc
 from helpers.log import append_tab_to_multilines
 from neuron import Neuron
@@ -15,8 +16,7 @@ class Layer:
     prev_layer: Layer | None
     neuron_net: NeuronNet | None
 
-    activation: ActivationFunc
-    activation_derivate: ActivationFunc
+    activation: BaseActivation
 
     predicts: list[float]
 
@@ -24,8 +24,7 @@ class Layer:
         self,
         neuron_count: int,
         weights_per_neuron: int,
-        activation: ActivationFunc,
-        activation_derivate: ActivationFunc,
+        activation: BaseActivation,
         prev_layer: Layer | None = None,
         neuron_net: NeuronNet | None = None,
     ):
@@ -33,7 +32,7 @@ class Layer:
         self.neuron_net = neuron_net
 
         self._create_neurons(neuron_count, weights_per_neuron)
-        self.set_activation(activation, activation_derivate)
+        self.set_activation(activation)
 
     def _create_neurons(self, count: int, weights_per_neuron: int):
         self.neurons = [Neuron(weights_per_neuron) for _ in range(count)]
@@ -46,14 +45,10 @@ class Layer:
         for n in self.neurons:
             n.prev_layer = prev_layer
 
-    def set_activation(
-        self, activation: ActivationFunc, activation_derivate: ActivationFunc
-    ):
+    def set_activation(self, activation: BaseActivation):
         self.activation = activation
-        self.activation_derivate = activation_derivate
         for n in self.neurons:
             n.activation = activation
-            n.activation_derivate = activation_derivate
 
     def get_local_gradient_sum(self, weight_idx) -> float:
         sumprod = sum(
@@ -74,9 +69,12 @@ class Layer:
         if hidden:
             for i, n in enumerate(self.neurons):
                 n.calc_local_gradient_hidden(i)
+                # print(f"Neuron#{i} gradient: ", n.local_gradient)
         else:
-            for n in self.neurons:
+            # print("Calc loc grad for output in layer")
+            for i, n in enumerate(self.neurons):
                 n.calc_local_gradient_output(answer)
+                # print(f"Neuron#{i} gradient: ", n.local_gradient)
 
     def get_data_str(self, idx: int) -> str:
         data = f"Layer#{idx}\n"

@@ -3,7 +3,7 @@ from datetime import datetime
 import matplotlib.animation as animator
 import matplotlib.pyplot as plt
 
-import activation_funcs as af
+from activation import LogisticActivation, ReluActivation
 from helpers.line import *
 from helpers.log import write_log
 from helpers.point import *
@@ -39,23 +39,26 @@ def setup_plot(
 
 
 def learn_func(nn: NeuronNet, inputs: list[MarkedPoint]) -> bool:
+    mse = 0.0
     is_learned = True
     for i in inputs:
         guess = nn.guess([i.x, i.y])
+        mse += (guess[0] - i.mark) ** 2
         if guess != i.mark:
             is_learned = False
             nn.backpropagation(i.mark)
-
+    mse /= len(inputs)
+    print("MSE: ", mse)
     return is_learned
 
 
 def nonlinear_classification_test():
     data = get_data_from_csv(r"data/straight_xor.csv", MarkedPoint)
 
-    hidden = Layer(2, 2, af.relu, af.relu_derivate)
-    output = Layer(1, 2, af.logistic, af.logistic_derivate)
+    hidden = Layer(2, 2, ReluActivation())
+    output = Layer(1, 2, LogisticActivation())
 
-    nn = NeuronNet([hidden, output], max_iter=10)
+    nn = NeuronNet([hidden, output], max_iter=100)
     nn.set_learn_func(learn_func)
 
     xs = [p.x for p in data]
@@ -94,7 +97,7 @@ def nonlinear_classification_test():
             print(f"ALL POINTS ARE GUESSED CORRECTLLY AT {iter}TH ATTEMPT")
             break
 
-    [print(ls[0], ls[1], end="\n") for ls in sep_lines]
+    # [print(ls[0], ls[1], end="\n") for ls in sep_lines]
 
     def animate(i):
         ax.set_title(f"Iter {i}")

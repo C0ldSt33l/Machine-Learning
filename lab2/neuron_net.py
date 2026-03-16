@@ -12,6 +12,8 @@ class NeuronNet:
     learn_func: Callable[[NeuronNet, list[MarkedPoint]], bool]
     max_iter: int
 
+    mse: float = 0.0
+
     def __init__(self, layers: list[Layer], max_iter: int = 100):
         for l in reversed(layers):
             self.add_layer(l)
@@ -36,6 +38,7 @@ class NeuronNet:
     def backpropagation(self, answer: float):
         for i, l in enumerate(self.layers):
             if i == 0:
+                # print("Start calc loc grad for output layer in nn")
                 l.learn_neurons(answer)
             else:
                 l.learn_neurons()
