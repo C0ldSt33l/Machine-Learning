@@ -11,6 +11,8 @@ from helpers.read_csv import get_data_from_csv
 from helpers.point import *
 from helpers.line import Line, get_line, calc_y
 
+from visualization import setup_fig
+
 
 def setup_plot(ax, points: list[Point], x_lims: list[float], y_lims: list[float]):
     """Рисует точки на заданных осях."""
@@ -48,33 +50,13 @@ def regression_test():
     print("Origin weights")
     print(model.get_weights())
 
-    log = model.fit(xs, ys, epochs=300, verbose=False)
+    log = model.fit(xs, ys, epochs=50, verbose=False)
 
     print("New weights")
     print(model.get_weights())
 
-    print("Guesses")
-    predicts = model.predict(xs, verbose=False)
-    print(predicts)
+    setup_fig(data, model, log.history['loss'], 'Linear Regression', False)
 
-    # Создаём два подграфика рядом
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-
-    # 1. График потерь (loss)
-    ax1.plot(log.history["loss"])
-    ax1.set_title("Training Loss")
-    ax1.set_xlabel("Epoch")
-    ax1.set_ylabel("Loss (MSE)")
-
-    # 2. График регрессии с исходными точками и предсказаниями
-    setup_plot(ax2, data, x_lims, y_lims)
-    # Рисуем линию регрессии: для плавности построим много точек по оси X
-    x_plot = np.linspace(x_lims[0], x_lims[1], 100)
-    y_plot = model.predict(x_plot, verbose=False)
-    ax2.plot(x_plot, y_plot, 'b-', label='Prediction')
-    ax2.legend()
-
-    plt.tight_layout()
     plt.show()
 
 
