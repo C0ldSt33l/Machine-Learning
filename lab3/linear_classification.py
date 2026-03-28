@@ -4,6 +4,7 @@ from tensorflow import keras
 from keras import Sequential
 from keras.layers import Dense, Input
 from keras import activations
+from keras import optimizers
 
 from helpers.point import MarkedPoint
 from helpers.read_csv import get_data_from_csv
@@ -17,7 +18,7 @@ def setup_model() -> Sequential:
 
     model.compile(
         loss=keras.losses.MeanSquaredError,
-        optimizer=keras.optimizers.Adam(0.1)
+        optimizer=optimizers.Adam(0.1)
     )
 
     return model

@@ -23,7 +23,7 @@ def setup_model() -> Sequential:
 
     return model
 
-def linear_classification_test():
+def non_linear_classification_test():
     data = get_data_from_csv(r"data/non-linear classification/rotated_xor.csv", MarkedPoint)
 
     inputs = np.array([(p.x, p.y) for p in data])
@@ -39,9 +39,9 @@ def linear_classification_test():
     print("New weights")
     print(model.get_weights())
 
-    setup_fig(data, model, log.history['loss'], 'Linear Classification')
+    setup_fig(data, model, log.history['loss'], 'Non-Linear Classification')
     plt.show()
 
 
 if __name__ == "__main__":
-    linear_classification_test()
+    non_linear_classification_test()

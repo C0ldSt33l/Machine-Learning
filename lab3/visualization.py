@@ -89,7 +89,7 @@ def _setup_regression_graph(ax, titel: str, data: list[Point], model: Sequential
 
     ax.scatter(xs, ys, color='red')
 
-    count = int(x_lims[1] - x_lims[0] + 1)
+    count = int(x_lims[1] - x_lims[0] + 1) * 100
     x_plot = np.linspace(x_lims[0], x_lims[1], count)
     y_plot = model.predict(x_plot, verbose=False)
     ax.plot(x_plot, y_plot, 'b-', label='Prediction')

@@ -14,8 +14,11 @@ from visualization import setup_fig
 
 def setup_model() -> Sequential:
     model = Sequential()
-    model.add(Input(shape=(2,)))
-    model.add(Dense(units=1, activation=activations.sigmoid))
+    model.add(Input(shape=(1,)))
+    model.add(Dense(units=20, activation=activations.relu))
+    model.add(Dense(units=10, activation=activations.relu))
+    model.add(Dense(units=5, activation=activations.leaky_relu))
+    model.add(Dense(units=1, activation=activations.linear))
 
     model.compile(
         loss=keras.losses.MeanSquaredError,
@@ -24,23 +27,24 @@ def setup_model() -> Sequential:
 
     return model
 
-def regression_test():
-    data = get_data_from_csv(r'data/linear regression/learn sample (big).csv', Point)
+def non_linear_regression_test():
+    data = get_data_from_csv(r'data/non-linear regression/sample.csv', Point)
+    xs, ys = [p.x for p in data], [p.y for p in data]
 
     model = setup_model()
 
     print("Origin weights")
     print(model.get_weights())
 
-    log = model.fit(xs, ys, epochs=50, verbose=False)
+    log = model.fit(np.array(xs), np.array(ys), epochs=300, verbose=False)
 
     print("New weights")
     print(model.get_weights())
 
-    setup_fig(data, model, log.history['loss'], 'Linear Regression', False)
+    setup_fig(data, model, log.history['loss'], 'Non-Linear Regression', False)
 
     plt.show()
 
 
 if __name__ == '__main__':
-    regression_test()
+    non_linear_regression_test()
