@@ -3,7 +3,7 @@ from datetime import datetime
 import matplotlib.animation as animator
 import matplotlib.pyplot as plt
 
-from activation import LogisticActivation, ReluActivation
+from activation import HyperbolicTangentActivation, LogisticActivation, ReluActivation
 from helpers.line import *
 from helpers.log import write_log
 from helpers.point import *
@@ -53,12 +53,13 @@ def learn_func(nn: NeuronNet, inputs: list[MarkedPoint]) -> bool:
 
 
 def nonlinear_classification_test():
-    data = get_data_from_csv(r"data/straight_xor.csv", MarkedPoint)
+    data = get_data_from_csv(r"data/rotated_xor.csv", MarkedPoint)
+    # data = [MarkedPoint(p.x, p.y, p.mark / 2) for p in data]
 
     hidden = Layer(2, 2, ReluActivation())
     output = Layer(1, 2, LogisticActivation())
 
-    nn = NeuronNet([hidden, output], max_iter=100)
+    nn = NeuronNet([hidden, output], max_iter=1000)
     nn.set_learn_func(learn_func)
 
     xs = [p.x for p in data]
@@ -80,6 +81,8 @@ def nonlinear_classification_test():
     )
 
     logname = datetime.now().strftime("%Y-%m-%d %H_%M_%S")
+    write_log(f"Hidden activation: {hidden.activation.__class__}\n", logname)
+    write_log(f"Output activation: {output.activation.__class__}\n", logname)
 
     iter = 0
     while (iter := iter + 1) <= nn.max_iter:

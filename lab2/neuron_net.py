@@ -65,3 +65,13 @@ class NeuronNet:
             data += l.get_data_str(i)
         data += "//////////////////////////////\n"
         return data
+
+    def get_data_from_point(
+        self, point: MarkedPoint, idx: int, answer: float, guess: list[float]
+    ) -> str:
+        data = f"#{idx}:{point.__str__()}\n"
+        for i, l in enumerate(reversed(self.layers)):
+            data += l.get_data_str(i)
+        data += f"answer: {answer}|guess: {guess}\n"
+        data += "//////////////////////////////\n"
+        return data

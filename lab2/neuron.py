@@ -19,10 +19,10 @@ class Neuron:
 
     activation: BaseActivation | None
 
-    local_gradient: float
-    net: float
-    input: list[float]
-    output: float
+    local_gradient: float = None
+    net: float = None
+    input: list[float] = None
+    output: float = None
 
     def __init__(
         self,
@@ -32,8 +32,8 @@ class Neuron:
         activation: BaseActivation | None = None,
         prev_layer: Layer | None = None,
     ):
-        self.weights = [round(uniform(0.0, 10.0), 3) for _ in range(weight_count)]
-        self.bias = bias if bias is not None else round(uniform(0.0, 10.0), 3)
+        self.weights = [round(uniform(-1.0, 1.0), 3) for _ in range(weight_count)]
+        self.bias = bias if bias is not None else round(uniform(-1.0, 10.0), 3)
         self.learning_speed = learnin_speed
         self.activation = activation
         self.prev_layer = prev_layer
@@ -46,7 +46,7 @@ class Neuron:
 
         self.input = input
         self.net = self._net(input)
-        self.output = self.activation.activate(self.net)
+        self.output = self.activation.activate(self.net) - 0.5
         return self.output
 
     def _net(self, input: list[float]) -> float:
