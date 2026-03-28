@@ -13,6 +13,7 @@ from visualization import setup_fig
 def setup_model() -> Sequential:
     model = Sequential()
     model.add(Input(shape=(2,)))
+    model.add(Dense(units=2, activation=activations.relu))
     model.add(Dense(units=1, activation=activations.sigmoid))
 
     model.compile(
@@ -23,7 +24,7 @@ def setup_model() -> Sequential:
     return model
 
 def linear_classification_test():
-    data = get_data_from_csv(r"data/linear classification/learn sample.csv", MarkedPoint)
+    data = get_data_from_csv(r"data/non-linear classification/rotated_xor.csv", MarkedPoint)
 
     inputs = np.array([(p.x, p.y) for p in data])
     targets = np.array([p.mark for p in data])
@@ -33,7 +34,7 @@ def linear_classification_test():
     print("Origin weights")
     print(model.get_weights())
 
-    log = model.fit(inputs, targets, epochs=300, verbose=False)
+    log = model.fit(inputs, targets, epochs=600, verbose=False)
 
     print("New weights")
     print(model.get_weights())

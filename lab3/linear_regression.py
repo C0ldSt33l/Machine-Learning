@@ -8,8 +8,7 @@ from keras import activations
 from keras import optimizers
 
 from helpers.read_csv import get_data_from_csv
-from helpers.point import *
-from helpers.line import Line, get_line, calc_y
+from helpers.point import Point
 
 from visualization import setup_fig
 
