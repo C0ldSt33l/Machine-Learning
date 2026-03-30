@@ -5,33 +5,58 @@ from termcolor import colored
 from tensorflow import keras
 from keras import Input, Sequential, activations, losses, optimizers
 from keras.datasets import mnist
-from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
+from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, BatchNormalization, Dropout
 
 from helpers.log import write_log
 
 STATIS_FILE = 'stats.log'
 MODEL_FILE = 'model.log'
 
-def setup_model() -> tuple[Sequential, int]:
-    model = Sequential()
+def setup_original_model() -> tuple[Sequential, int]:
     epochs = 3
+    model = Sequential([
+        Input(shape=(28, 28, 1), batch_size=32),
 
-    model.add(Input(shape=(28, 28, 1), batch_size=32))
-    model.add(
         Conv2D(
             filters=50,
             kernel_size=(3, 3),
             strides=(1, 1),
             padding="same",
             activation=activations.relu,
-        )
-    )
-    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-    model.add(Flatten())
-    model.add(Dense(units=10, activation=activations.softmax))
+        ),
+        MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
+
+        Flatten(),
+        Dense(units=10, activation=activations.softmax),
+    ])
 
     print(model.summary())
+    model.compile(
+        optimizer=optimizers.Adam(),
+        loss=losses.categorical_crossentropy,
+        metrics=["accuracy", "precision", "recall"],
+    )
 
+    return (model, epochs)
+
+def setup_model() -> tuple[Sequential, int]:
+    epochs = 2
+    model = Sequential([
+        Input(shape=(28, 28, 1), batch_size=32),
+
+        Conv2D(32, (3,3), padding="same", activation=activations.relu),
+        BatchNormalization(),
+        Conv2D(32, (2,2), activation=activations.relu),
+        MaxPooling2D((2,2)),
+        Dropout(0.25),
+
+        Flatten(),
+        Dense(128, activation=activations.relu),
+        Dropout(0.5),
+        Dense(10, activation=activations.softmax),
+    ])
+
+    print(model.summary())
     model.compile(
         optimizer=optimizers.Adam(),
         loss=losses.categorical_crossentropy,
@@ -66,14 +91,14 @@ def get_color(first: float, second: float, is_loss: bool=False) -> str:
 
 
 
-def print_statistic_and_log(model: Sequential, xs_train, y_train_cats, xs_test, y_test_cats , verbose: bool=False):
+def print_statistic_and_log(model: Sequential, orig_model: Sequential, xs_train, y_train_cats, xs_test, y_test_cats , verbose: bool=False):
     train_score = model.evaluate(xs_train, y_train_cats, verbose=verbose)
     test_score = model.evaluate(xs_test, y_test_cats, verbose=verbose)
 
     last_iter, train_stats, test_stats = get_last_iter_and_stats('log/', 'stats.log')
 
-    train_score = [0.03272294417023659, 0.9976333475112915, 0.9994620776176453, 0.9958999848365784]
-    test_score = [0.03272294417023659, 0.9976333475112915, 0.9994620776176453, 0.9958999848365784]
+    train_stats = orig_model.evaluate(xs_train, y_train_cats, verbose=verbose)
+    test_stats = orig_model.evaluate(xs_test, y_test_cats, verbose=verbose)
 
     stats = f'''
         Ошибка на обучающей выборке: {colored(str(train_score[0]), get_color(train_score[0], train_stats[0], True))} | {train_stats[0]}
@@ -124,11 +149,13 @@ def test():
     print(y_train_cat[0])
 
 
+    orig_model, orig_epochs = setup_original_model()
     model, epochs = setup_model()
 
+    orig_model.fit(x_train, y_train_cat, epochs=orig_epochs, verbose=False)
     model.fit(x_train, y_train_cat, epochs=epochs, verbose=False)
 
-    print_statistic_and_log(model, x_train, y_train_cat, x_test, y_test_cat)
+    print_statistic_and_log(model, orig_model, x_train, y_train_cat, x_test, y_test_cat)
 
 if __name__ == '__main__':
     test()
